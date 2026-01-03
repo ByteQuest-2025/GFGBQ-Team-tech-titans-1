@@ -3,3 +3,12 @@ langchain
 langchain-community
 chromadb
 sentence-transformers
+crewai
+langchain-google-genai
+python-dotenv
+
+# --- CRITICAL VERSION FIXES ---
+# These are pinned to prevent the app from crashing due to the
+# conflict between CrewAI and Transformers we fixed earlier.
+transformers==4.46.0
+tokenizers==0.20.3
