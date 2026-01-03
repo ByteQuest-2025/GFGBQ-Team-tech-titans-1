@@ -31,71 +31,100 @@ def get_compliance_score():
     if "user_role" in st.session_state: score += 10
     return min(score, 100)
 
-# --- 3. PREMIUM DARK CSS (FIXED FOR LIGHT LAPTOPS) ---
+# --- 3. ULTIMATE DARK MODE & BOLD WHITE BORDERS ---
 st.markdown("""
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-    /* --- GLOBAL FIXES FOR LIGHT COMPUTERS --- */
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-    
-    /* Force the entire browser window to be black, preventing white gaps */
+    /* 1. GLOBAL RESET */
+    :root {
+        --primary-color: #00C853;
+        --background-color: #000000;
+        --secondary-background-color: #050505;
+        --text-color: #FFFFFF;
+        --font: "sans-serif";
+    }
+
     html, body, .stApp {
         background-color: #000000 !important;
-        height: 100vh;
-        margin: 0;
-    }
-    
-    /* Remove default Streamlit top padding */
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 5rem;
+        color: #FFFFFF !important;
     }
 
-    /* Hide the top header bar styling */
-    header[data-testid="stHeader"] {
-        background-color: transparent !important;
-    }
-
-    /* Standard Font Application */
-    * {
-        font-family: 'Outfit', sans-serif;
-        color: #F0F2F6;
+    /* 2. TEXT VISIBILITY */
+    h1, h2, h3, h4, h5, h6, p, li, span, div, label {
+        color: #FFFFFF !important;
     }
     
-    /* --- GLASS CARDS --- */
+    .stCaption, small {
+        color: #E0E0E0 !important;
+    }
+
+    /* 3. BOLD WHITE INPUT BORDERS */
+    /* Target Input Boxes, Select Boxes, Number Inputs */
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="base-input"] > div,
+    div[data-baseweb="input"] > div {
+        background-color: #111111 !important;
+        border: 2px solid #FFFFFF !important; /* BOLD WHITE BORDER */
+        color: #FFFFFF !important;
+        border-radius: 8px !important;
+    }
+    input {
+        color: #FFFFFF !important;
+    }
+
+    /* 4. DROPDOWN MENU (The Popup) */
+    div[data-baseweb="popover"] {
+        background-color: #111111 !important;
+        border: 2px solid #FFFFFF !important; /* White Border on Popup too */
+    }
+
+    div[data-baseweb="popover"] ul {
+        background-color: #111111 !important;
+    }
+
+    div[data-baseweb="popover"] li {
+        background-color: #111111 !important;
+        color: #FFFFFF !important;
+        border-bottom: 1px solid #333 !important;
+    }
+
+    div[data-baseweb="popover"] li:hover,
+    div[data-baseweb="popover"] li[aria-selected="true"] {
+        background-color: #00C853 !important;
+        color: #FFFFFF !important;
+    }
+
+    div[data-baseweb="select"] svg {
+        fill: #FFFFFF !important;
+    }
+
+    /* 5. SIDEBAR & HEADER */
+    [data-testid="stSidebar"] {
+        background-color: #050505 !important;
+        border-right: 2px solid #333 !important; 
+    }
+    header[data-testid="stHeader"] { background-color: transparent !important; }
+
+    /* 6. BOLD WHITE CARD STYLES */
     .glass-card {
         background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        /* 2px Solid White Border for Cards */
+        border: 2px solid #FFFFFF !important; 
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
     }
     
-    /* --- EMPTY STATE --- */
     .empty-state {
         background: rgba(255, 255, 255, 0.02);
-        border: 1px dashed rgba(255, 255, 255, 0.2);
+        border: 2px dashed #FFFFFF !important; /* Bold Dashed White */
         border-radius: 16px;
         text-align: center;
         padding: 60px 20px;
-        color: #888;
     }
 
-    /* --- INPUTS --- */
-    .stTextInput > div > div > input, 
-    .stNumberInput > div > div > input, 
-    .stSelectbox > div > div > div {
-        background-color: #111111 !important;
-        border: 1px solid #333 !important;
-        border-radius: 10px !important;
-        color: white !important;
-    }
-    
-    /* --- BUTTONS --- */
+    /* 7. BUTTONS */
     .stButton > button {
         background: linear-gradient(135deg, #00C853 0%, #009688 100%) !important;
         color: white !important;
@@ -103,33 +132,19 @@ st.markdown("""
         border-radius: 10px;
         font-weight: 600;
         padding: 0.75rem 1.5rem;
-        letter-spacing: 0.5px;
     }
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 200, 83, 0.4);
-    }
-    
-    /* --- TEXT GRADIENTS --- */
+
     .gradient-text {
         background: linear-gradient(45deg, #00C853, #69F0AE);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 700;
     }
-
-    /* --- SIDEBAR --- */
-    [data-testid="stSidebar"] {
-        background-color: #050505 !important;
-        border-right: 1px solid #1F1F1F;
+    h1 .gradient-text {
+       color: transparent !important; 
     }
-    
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    
-    /* --- ICON HELPERS --- */
-    .icon-xl { font-size: 32px; vertical-align: middle; margin-right: 10px; color: #00C853; }
-    .icon-lg { font-size: 24px; vertical-align: middle; margin-right: 8px; }
+
+    .icon-xl { font-size: 32px; vertical-align: middle; margin-right: 10px; color: #00C853 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -138,7 +153,7 @@ with st.sidebar:
     st.markdown("""
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
             <i class="ph-fill ph-circles-three-plus" style="font-size: 30px; color: #00C853;"></i>
-            <h2 style="margin:0; font-size: 24px;">TaxPilot</h2>
+            <h2 style="margin:0; font-size: 24px; color: white !important;">TaxPilot</h2>
         </div>
     """, unsafe_allow_html=True)
     
@@ -152,16 +167,15 @@ with st.sidebar:
         menu_icon="cast", 
         default_index=1,
         styles={
-            "container": {"padding": "0!important", "background-color": "transparent"},
+            "container": {"padding": "0!important", "background-color": "#050505"},
             "icon": {"color": "#00C853", "font-size": "18px"}, 
-            "nav-link": {"color": "#E0E0E0", "font-size": "16px", "margin": "5px"},
+            "nav-link": {"color": "#FFFFFF", "font-size": "16px", "margin": "5px", "background-color": "#050505"},
             "nav-link-selected": {"background-color": "rgba(0, 200, 83, 0.1)", "color": "#00C853", "border": "1px solid #00C853"}, 
         }
     )
 
     st.markdown("---")
     
-    # FINANCIAL HEALTH
     current_score = get_compliance_score()
     st.markdown("### <i class='ph ph-heartbeat'></i> Financial Health", unsafe_allow_html=True)
     st.write(f"**Score:** {current_score}/100")
@@ -186,7 +200,7 @@ with st.sidebar:
     st.markdown("""
     <div style="background: rgba(0, 200, 83, 0.1); border: 1px solid #00C853; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px;">
         <div style="width: 8px; height: 8px; background: #00C853; border-radius: 50%; box-shadow: 0 0 10px #00C853;"></div>
-        <span style="color: #00C853; font-weight: 600; font-size: 12px;">SYSTEM OPERATIONAL</span>
+        <span style="color: #00C853 !important; font-weight: 600; font-size: 12px;">SYSTEM OPERATIONAL</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -201,7 +215,7 @@ os.environ["GOOGLE_API_KEY"] = my_key
 # 🤖 TAB 1: AI ASSISTANT
 # ==========================
 if selected_page == "AI Assistant":
-    st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-sparkle icon-xl"></i> AI <span class="gradient-text">Copilot</span></h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-sparkle icon-xl"></i> AI <span class="gradient-text" style="color:transparent !important;">Copilot</span></h1>', unsafe_allow_html=True)
     st.markdown("Your **Real-time Compliance Expert**.")
     st.write("")
     
@@ -228,7 +242,7 @@ if selected_page == "AI Assistant":
                     st.markdown(f"""
                     <div class="glass-card">
                         <h3><i class="ph ph-lightbulb"></i> Expert Advice</h3>
-                        <p style="margin-top: 10px; line-height: 1.6;">{res}</p>
+                        <p style="margin-top: 10px; line-height: 1.6; color: white;">{res}</p>
                     </div>
                     """, unsafe_allow_html=True)
                     st.toast("Score Updated: Learning (+10)", icon="📈")
@@ -238,7 +252,7 @@ if selected_page == "AI Assistant":
 # 🧮 TAB 2: SMART ESTIMATOR
 # ==========================
 elif selected_page == "Tax Estimator":
-    st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-calculator icon-xl"></i> Smart <span class="gradient-text">Estimator</span></h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-calculator icon-xl"></i> Smart <span class="gradient-text" style="color:transparent !important;">Estimator</span></h1>', unsafe_allow_html=True)
     st.markdown("Compare regimes and calculate liability with precision **(FY 2025-26)**.")
     st.write("") 
 
@@ -279,42 +293,20 @@ elif selected_page == "Tax Estimator":
         # --- FY 2025-26 Logic (Updated Slabs & Rebate) ---
         def get_tax(inc):
             # 1. Section 87A Rebate: NIL tax if income <= 12 Lakhs
-            if inc <= 1200000:
-                return 0
+            if inc <= 1200000: return 0
             
             # 2. Slab Calculation
             tax = 0
-            # 0 - 4L: Nil
-            
-            # 4L - 8L: 5%
-            if inc > 400000:
-                tax += (min(inc, 800000) - 400000) * 0.05
-            
-            # 8L - 12L: 10%
-            if inc > 800000:
-                tax += (min(inc, 1200000) - 800000) * 0.10
-                
-            # 12L - 16L: 15%
-            if inc > 1200000:
-                tax += (min(inc, 1600000) - 1200000) * 0.15
-                
-            # 16L - 20L: 20%
-            if inc > 1600000:
-                tax += (min(inc, 2000000) - 1600000) * 0.20
-                
-            # 20L - 24L: 25%
-            if inc > 2000000:
-                tax += (min(inc, 2400000) - 2000000) * 0.25
-                
-            # Above 24L: 30%
-            if inc > 2400000:
-                tax += (inc - 2400000) * 0.30
+            if inc > 400000: tax += (min(inc, 800000) - 400000) * 0.05
+            if inc > 800000: tax += (min(inc, 1200000) - 800000) * 0.10
+            if inc > 1200000: tax += (min(inc, 1600000) - 1200000) * 0.15
+            if inc > 1600000: tax += (min(inc, 2000000) - 1600000) * 0.20
+            if inc > 2000000: tax += (min(inc, 2400000) - 2000000) * 0.25
+            if inc > 2400000: tax += (inc - 2400000) * 0.30
 
-            # 3. Marginal Relief (For income slightly above 12L)
-            # If tax calculated > (Income - 12L), then Tax = (Income - 12L)
+            # 3. Marginal Relief
             excess_income = inc - 1200000
-            if tax > excess_income:
-                tax = excess_income
+            if tax > excess_income: tax = excess_income
 
             # 4. Cess (4%)
             return tax * 1.04
@@ -333,41 +325,40 @@ elif selected_page == "Tax Estimator":
                 if savings > 0:
                     st.markdown(f"""
                     <div class="glass-card" style="background: rgba(0, 200, 83, 0.1); border-color: #00C853; text-align: center;">
-                        <h3 style="margin:0; color: #E0E0E0; font-size: 1rem;">🎉 YOU SAVE</h3>
-                        <h1 style="margin:0; font-size: 3rem; color: #00C853;">₹{savings:,.0f}</h1>
-                        <p style="margin:0; opacity: 0.7;">by choosing Presumptive Scheme</p>
+                        <h3 style="margin:0; color: #E0E0E0 !important; font-size: 1rem;">🎉 YOU SAVE</h3>
+                        <h1 style="margin:0; font-size: 3rem; color: #00C853 !important;">₹{savings:,.0f}</h1>
+                        <p style="margin:0; opacity: 0.8; color: white !important;">by choosing Presumptive Scheme</p>
                     </div>
                     """, unsafe_allow_html=True)
                 
                 c1, c2 = st.columns(2)
                 with c1:
-                    st.markdown(f"""<div class="glass-card" style="text-align: center;"><small>Regular Tax</small><h3 style="color: #FF5252;">₹{tax_regular:,.0f}</h3></div>""", unsafe_allow_html=True)
+                    st.markdown(f"""<div class="glass-card" style="text-align: center;"><small style="color:#ddd;">Regular Tax</small><h3 style="color: #FF5252 !important;">₹{tax_regular:,.0f}</h3></div>""", unsafe_allow_html=True)
                 with c2:
-                    st.markdown(f"""<div class="glass-card" style="text-align: center;"><small>{section_name}</small><h3 style="color: #00C853;">₹{tax_presumptive:,.0f}</h3></div>""", unsafe_allow_html=True)
+                    st.markdown(f"""<div class="glass-card" style="text-align: center;"><small style="color:#ddd;">{section_name}</small><h3 style="color: #00C853 !important;">₹{tax_presumptive:,.0f}</h3></div>""", unsafe_allow_html=True)
 
                 st.markdown("#### Visual Comparison")
                 fig = go.Figure(data=[
                     go.Bar(name='Regular', x=['Tax'], y=[tax_regular], marker_color='#2c3e50'),
                     go.Bar(name='Presumptive', x=['Tax'], y=[tax_presumptive], marker_color='#00C853')
                 ])
-                fig.update_layout(height=200, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#E0E0E0'), showlegend=False, margin=dict(l=0,r=0,t=0,b=0))
+                fig.update_layout(height=200, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#FFFFFF'), showlegend=False, margin=dict(l=0,r=0,t=0,b=0))
                 st.plotly_chart(fig, use_container_width=True)
 
             else:
                 val = tax_presumptive if calc_mode == "Presumptive (Standard)" else tax_regular
                 st.markdown(f"""
                 <div class="glass-card" style="text-align: center;">
-                    <h3 style="margin:0; color: #E0E0E0;">Estimated Tax Liability</h3>
-                    <h1 style="margin:0; font-size: 3.5rem; color: #69F0AE;">₹{val:,.0f}</h1>
+                    <h3 style="margin:0; color: #E0E0E0 !important;">Estimated Tax Liability</h3>
+                    <h1 style="margin:0; font-size: 3.5rem; color: #69F0AE !important;">₹{val:,.0f}</h1>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            # PROFESSIONAL EMPTY STATE
             st.markdown("""
             <div class="empty-state">
                 <i class="ph ph-trend-up" style="font-size: 40px; color: #888; margin-bottom: 15px;"></i>
-                <h3 style="color: #F0F2F6; margin-bottom: 10px;">Ready to Optimize?</h3>
-                <p style="color: #9E9E9E; font-size: 14px; max-width: 300px; margin: 0 auto;">
+                <h3 style="color: #FFFFFF; margin-bottom: 10px;">Ready to Optimize?</h3>
+                <p style="color: #E0E0E0; font-size: 14px; max-width: 300px; margin: 0 auto;">
                     Fill in your business details on the left. We'll instantly compare regimes and find your savings.
                 </p>
             </div>
@@ -381,7 +372,7 @@ elif selected_page == "Calendar":
         st.session_state["user_actions"]["visited_calendar"] = True
         st.toast("Score Updated: Awareness (+10)", icon="📅")
     
-    st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-calendar-check icon-xl"></i> Proactive <span class="gradient-text">Compliance</span></h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-calendar-check icon-xl"></i> Proactive <span class="gradient-text" style="color:transparent !important;">Compliance</span></h1>', unsafe_allow_html=True)
     st.markdown("### 🛡️ Your Shield Against Penalties")
     st.write("")
 
@@ -391,10 +382,10 @@ elif selected_page == "Calendar":
     # THE HERO ALERT
     st.markdown("""
     <div style="background: rgba(255, 152, 0, 0.1); border: 1px solid #FF9800; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-        <h3 style="color: #FF9800; margin:0; display:flex; align-items:center; gap:8px;">
+        <h3 style="color: #FF9800 !important; margin:0; display:flex; align-items:center; gap:8px;">
             <i class="ph-fill ph-warning-circle"></i> Advance Tax (100% Payment)
         </h3>
-        <p style="color: #E0E0E0; margin: 5px 0;">Due in <b>14 DAYS</b> (15th March). Avoid 1% monthly interest.</p>
+        <p style="color: #FFFFFF !important; margin: 5px 0;">Due in <b>14 DAYS</b> (15th March). Avoid 1% monthly interest.</p>
     </div>
     """, unsafe_allow_html=True)
 
