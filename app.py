@@ -1,10 +1,11 @@
 import streamlit as st
 import os
 import pandas as pd
-import plotly.graph_objects as go 
+import plotly.graph_objects as go
 from datetime import datetime, date
 from crewai import Agent, Task, Crew
 from langchain_google_genai import ChatGoogleGenerativeAI
+from streamlit_option_menu import option_menu 
 
 # --- 1. Page Config ---
 st.set_page_config(
@@ -17,7 +18,7 @@ st.set_page_config(
 # --- 2. PREMIUM DARK MODE CSS ---
 st.markdown("""
 <style>
-    /* Import Font */
+    /* Import Font: Inter */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
     /* 1. Global Reset */
@@ -35,7 +36,7 @@ st.markdown("""
         border-right: 1px solid #1F2937;
     }
 
-    /* 3. HEADER FIX */
+    /* 3. Header Fix */
     header[data-testid="stHeader"] {
         background-color: #050505 !important;
     }
@@ -43,14 +44,14 @@ st.markdown("""
         color: #E0E0E0 !important;
     }
 
-    /* 4. Headers (Neon Glow) */
+    /* 4. Neon Headers */
     h1, h2, h3 {
         color: #FFFFFF !important;
-        text-shadow: 0 0 10px rgba(0, 200, 83, 0.4);
+        text-shadow: 0 0 10px rgba(0, 200, 83, 0.4); /* Neon Green Glow */
         font-weight: 800 !important;
     }
 
-    /* 5. Metric Cards */
+    /* 5. Metric Cards (Glassy) */
     .stMetric {
         background-color: #111111 !important;
         border: 1px solid #333333 !important;
@@ -66,7 +67,7 @@ st.markdown("""
     }
 
     /* 6. Input Fields */
-    .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div {
+    .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div, .stTextArea>div>div>textarea {
         background-color: #161B22 !important; 
         color: #E0E0E0 !important;
         border: 1px solid #30363D;
@@ -79,6 +80,12 @@ st.markdown("""
         border: none;
         border-radius: 8px;
         font-weight: 600;
+        padding: 0.6rem 1rem;
+    }
+
+    /* 8. Sidebar padding fix */
+    .css-1d391kg {
+        padding-top: 1rem;
     }
     
     /* Hide Defaults */
@@ -87,26 +94,68 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. Sidebar Navigation ---
-st.sidebar.title("💰 TaxPilot")
-st.sidebar.caption("AI Tax & Compliance for India")
-st.sidebar.markdown("---")
-st.sidebar.success("✅ System Online")
+# --- 3. Sidebar Navigation & Features ---
+
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/4144/4144837.png", width=50) 
+    st.title("TaxPilot")
+    st.caption("AI Tax & Compliance for India")
+    
+    st.markdown("---")
+
+    # CUSTOM NAVIGATION MENU (Fixed Visibility)
+    selected_page = option_menu(
+        menu_title=None, 
+        options=["AI Assistant", "Tax Estimator", "Calendar"], 
+        icons=["robot", "calculator", "calendar-check"], 
+        menu_icon="cast", 
+        default_index=0,
+        styles={
+            "container": {"padding": "0!important", "background-color": "transparent"},
+            "icon": {"color": "#00C853", "font-size": "18px"}, # Neon Green Icons
+            "nav-link": {
+                "font-size": "16px",
+                "text-align": "left",
+                "margin": "5px",
+                "color": "#E0E0E0",
+            },
+            # THE FIX: Dark Grey Background + Green Text + Green Border
+            # This ensures the Green Icon stands out against the Dark Grey background
+            "nav-link-selected": {
+                "background-color": "#1F2937", 
+                "color": "#00C853", 
+                "font-weight": "bold",
+                "border-left": "5px solid #00C853"
+            }, 
+        }
+    )
+
+    st.markdown("---")
+    
+    # Language Selector
+    language = st.selectbox("🗣️ Language / भाषा", ["English", "Hindi (हिंदी)", "Hinglish", "Marathi (मराठी)"])
+    
+    st.markdown("---")
+    
+    # Status Indicator
+    st.markdown("""
+    <div style="background: rgba(0, 200, 83, 0.1); border: 1px solid #00C853; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px;">
+        <div style="width: 10px; height: 10px; background: #00C853; border-radius: 50%; box-shadow: 0 0 10px #00C853;"></div>
+        <span style="color: #00C853; font-weight: 600; font-size: 14px;">System Online</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 # --- 4. API Key Setup ---
 raw_api_key = "AIzaSyAJLhXLQaY4U-u6ipI_IFROXi_n1m5MAug"
 my_key = raw_api_key.strip()
 os.environ["GOOGLE_API_KEY"] = my_key
 
-# Navigation
-page = st.sidebar.radio("Navigate", ["🤖 AI Tax Assistant", "🧮 Smart Tax Estimator", "📅 Compliance Calendar"])
-
 # --- 5. Main Logic ---
 
 # ==========================
 # 🤖 TAB 1: AI ASSISTANT
 # ==========================
-if page == "🤖 AI Tax Assistant":
+if selected_page == "AI Assistant":
     st.title("🤖 AI Tax Assistant")
     st.markdown("Your **Real-time Compliance Copilot**. Ask about GST, 44ADA, or Penalties.")
     st.markdown("---")
@@ -119,7 +168,7 @@ if page == "🤖 AI Tax Assistant":
         elif not user_query:
             st.warning("⚠️ Please enter a question.")
         else:
-            with st.spinner("Analyzing Latest Tax Rules (FY 2025-26)..."):
+            with st.spinner(f"Analyzing in {language}..."):
                 try:
                     gemini_llm = ChatGoogleGenerativeAI(
                         model="gemini-2.5-flash",
@@ -131,15 +180,24 @@ if page == "🤖 AI Tax Assistant":
                     tax_expert = Agent(
                         role='Compliance Expert',
                         goal='Simplify tax laws for micro-businesses and gig workers.',
-                        backstory="You are an expert CA. You remove fear by explaining rules simply.",
+                        backstory="You are an expert CA. You remove fear by explaining rules simply and clearly.", 
                         verbose=True,
                         allow_delegation=False,
                         llm=gemini_llm 
                     )
 
+                    if language == "English":
+                        lang_instruction = "Answer in professional English. Use bullet points for clarity. Avoid long paragraphs."
+                    elif language == "Hindi (हिंदी)":
+                        lang_instruction = "Answer in Hindi (Devanagari). Use bullet points. Keep financial terms in English brackets e.g. कर (Tax)."
+                    elif language == "Marathi (मराठी)":
+                        lang_instruction = "Answer in Marathi. Use bullet points."
+                    else: 
+                        lang_instruction = "Answer in Hinglish. Use bullet points."
+
                     answer_task = Task(
-                        description=f"User Query: '{user_query}'. Provide a reassuring, accurate answer based on India FY 2025-26 laws.",
-                        expected_output="Clear advice.",
+                        description=f"User Query: '{user_query}'. {lang_instruction}. Provide a helpful, structured answer. Prioritize clarity over brevity, but avoid fluff.",
+                        expected_output=f"Structured advice in {language} with bullet points.",
                         agent=tax_expert
                     )
 
@@ -148,7 +206,7 @@ if page == "🤖 AI Tax Assistant":
                     
                     st.success("✅ Advice Generated")
                     st.markdown(f"""
-                    <div style="background-color: #111827; padding: 20px; border-radius: 10px; border-left: 5px solid #00C853; color: #E0E0E0;">
+                    <div style="background-color: #111827; padding: 20px; border-radius: 10px; border-left: 5px solid #00C853; color: #E0E0E0; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
                         {result}
                     </div>
                     """, unsafe_allow_html=True)
@@ -159,7 +217,7 @@ if page == "🤖 AI Tax Assistant":
 # ==========================
 # 🧮 TAB 2: SMART ESTIMATOR
 # ==========================
-elif page == "🧮 Smart Tax Estimator":
+elif selected_page == "Tax Estimator":
     st.title("🧮 Smart Tax Estimator (FY 2025-26)")
     st.markdown("Calculate tax for **Micro-Businesses** & **Freelancers**.")
     st.markdown("---")
@@ -187,7 +245,7 @@ elif page == "🧮 Smart Tax Estimator":
             desc = "As a small trader (digital), the govt assumes only **6%** of your turnover is profit."
 
         st.markdown(f"""
-        <div style="background-color: #064E3B; padding: 15px; border-radius: 8px; border: 1px solid #059669; color: #A7F3D0; margin-top: 10px;">
+        <div style="background-color: #064E3B; padding: 15px; border-radius: 8px; border: 1px solid #059669; color: #D1FAE5; margin-top: 10px;">
             <strong>💡 {section_name} Logic:</strong><br>{desc}
         </div>
         """, unsafe_allow_html=True)
@@ -224,10 +282,10 @@ elif page == "🧮 Smart Tax Estimator":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # --- DETAILED PLOTLY CHART (Upgraded) ---
+        # --- PLOTLY CHART ---
         fig = go.Figure()
 
-        # 1. Regular Audit Bar (Dark Grey)
+        # Regular Bar
         fig.add_trace(go.Bar(
             x=['Regular Audit'],
             y=[tax_normal],
@@ -235,11 +293,10 @@ elif page == "🧮 Smart Tax Estimator":
             marker=dict(color='#374151', line=dict(color='#6B7280', width=1)),
             text=[f"₹{tax_normal:,.0f}"],
             textposition='auto',
-            textfont=dict(color='white', size=16, family="Inter", weight="bold"),
-            hoverinfo='y+name'
+            textfont=dict(color='white', size=16, family="Inter", weight="bold")
         ))
 
-        # 2. Presumptive Tax Bar (Neon Green)
+        # Presumptive Bar
         fig.add_trace(go.Bar(
             x=[f'Presumptive ({section_name})'],
             y=[tax_presumptive],
@@ -247,15 +304,14 @@ elif page == "🧮 Smart Tax Estimator":
             marker=dict(color='#00C853', line=dict(color='#69F0AE', width=2)),
             text=[f"₹{tax_presumptive:,.0f}"],
             textposition='auto',
-            textfont=dict(color='black', size=16, family="Inter", weight="bold"),
-            hoverinfo='y+name'
+            textfont=dict(color='black', size=16, family="Inter", weight="bold")
         ))
 
-        # 3. Add Annotation (Arrow showing Savings)
+        # Savings Arrow
         if savings > 0:
             fig.add_annotation(
                 x=f'Presumptive ({section_name})',
-                y=tax_presumptive + (savings / 2),
+                y=tax_presumptive + (savings / 3),
                 text=f"<b>You Save ₹{savings:,.0f}!</b>",
                 showarrow=True,
                 arrowhead=2,
@@ -267,25 +323,14 @@ elif page == "🧮 Smart Tax Estimator":
                 font=dict(color="#00E676", size=14)
             )
 
-        # 4. Final Layout
         fig.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             showlegend=False,
-            height=400,
-            margin=dict(l=0, r=0, t=40, b=0),
-            xaxis=dict(
-                showgrid=False,
-                tickfont=dict(color='#E0E0E0', size=14, family="Inter")
-            ),
-            yaxis=dict(
-                showgrid=True,
-                gridcolor='#333333',
-                gridwidth=1,
-                tickfont=dict(color='#E0E0E0', size=12, family="Inter"),
-                tickformat="₹",
-                zeroline=False
-            )
+            height=350,
+            margin=dict(l=0, r=0, t=30, b=0),
+            xaxis=dict(showgrid=False, tickfont=dict(color='#E0E0E0', size=14, family="Inter")),
+            yaxis=dict(showgrid=True, gridcolor='#333333', tickfont=dict(color='#E0E0E0', size=12), tickformat="₹")
         )
 
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
@@ -293,7 +338,7 @@ elif page == "🧮 Smart Tax Estimator":
 # ==========================
 # 📅 TAB 3: PROACTIVE CALENDAR
 # ==========================
-elif page == "📅 Compliance Calendar":
+elif selected_page == "Calendar":
     st.title("📅 Proactive Compliance Calendar")
     st.markdown("### 🛡️ Your Shield Against Penalties")
     

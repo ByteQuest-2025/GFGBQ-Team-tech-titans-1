@@ -4,11 +4,13 @@ langchain-community
 chromadb
 sentence-transformers
 crewai
-langchain-google-genai 
+langchain-google-genai
 python-dotenv
+streamlit-option-menu
+plotly
+altair
 
 # --- CRITICAL VERSION FIXES ---
-# These are pinned to prevent the app from crashing due to the
-# conflict between CrewAI and Transformers we fixed earlier.
+# Pinned to prevent the CrewAI/Transformers conflict
 transformers==4.46.0
 tokenizers==0.20.3
