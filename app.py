@@ -10,7 +10,7 @@ from streamlit_option_menu import option_menu
 # --- 1. Page Config ---
 st.set_page_config(
     page_title="TaxPilot", 
-    page_icon="💰", 
+    page_icon="👨‍✈️", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -18,40 +18,25 @@ st.set_page_config(
 # --- 2. PREMIUM DARK MODE CSS ---
 st.markdown("""
 <style>
-    /* Import Font: Inter */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-
-    /* 1. Global Reset */
-    html, body, [class*="css"] {
+    
+    html, body, [class*="css"], [data-testid="stAppViewContainer"], .stApp {
         font-family: 'Inter', sans-serif;
-        color: #E0E0E0;
-    }
-
-    /* 2. Backgrounds */
-    .stApp {
-        background-color: #050505; 
+        background-color: #050505 !important; 
+        color: #E0E0E0 !important;
     }
     [data-testid="stSidebar"] {
-        background-color: #0A0A0A;
+        background-color: #0A0A0A !important;
         border-right: 1px solid #1F2937;
     }
-
-    /* 3. Header Fix */
     header[data-testid="stHeader"] {
         background-color: #050505 !important;
     }
-    header[data-testid="stHeader"] * {
-        color: #E0E0E0 !important;
-    }
-
-    /* 4. Neon Headers */
     h1, h2, h3 {
         color: #FFFFFF !important;
-        text-shadow: 0 0 10px rgba(0, 200, 83, 0.4); /* Neon Green Glow */
+        text-shadow: 0 0 10px rgba(0, 200, 83, 0.4); 
         font-weight: 800 !important;
     }
-
-    /* 5. Metric Cards (Glassy) */
     .stMetric {
         background-color: #111111 !important;
         border: 1px solid #333333 !important;
@@ -62,18 +47,11 @@ st.markdown("""
         font-size: 28px !important;
         color: #FFFFFF !important;
     }
-    [data-testid="stMetricLabel"] {
-        color: #9CA3AF !important;
-    }
-
-    /* 6. Input Fields */
-    .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div, .stTextArea>div>div>textarea {
+    .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div {
         background-color: #161B22 !important; 
         color: #E0E0E0 !important;
-        border: 1px solid #30363D;
+        border: 1px solid #30363D !important;
     }
-    
-    /* 7. Buttons */
     .stButton > button {
         background: linear-gradient(90deg, #00C853, #009688) !important;
         color: white !important;
@@ -82,28 +60,25 @@ st.markdown("""
         font-weight: 600;
         padding: 0.6rem 1rem;
     }
-
-    /* 8. Sidebar padding fix */
-    .css-1d391kg {
-        padding-top: 1rem;
-    }
-    
-    /* Hide Defaults */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. Sidebar Navigation & Features ---
+# --- 3. SESSION STATE INIT (For Dynamic Health Bar) ---
+if "compliance_score" not in st.session_state:
+    st.session_state["compliance_score"] = 40  # Start Red
+if "loan_unlocked" not in st.session_state:
+    st.session_state["loan_unlocked"] = False
 
+# --- 4. Sidebar Navigation & Features ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/4144/4144837.png", width=50) 
+    st.image("https://cdn-icons-png.flaticon.com/512/2917/2917242.png", width=70) 
     st.title("TaxPilot")
     st.caption("AI Tax & Compliance for India")
     
     st.markdown("---")
 
-    # CUSTOM NAVIGATION MENU (Fixed Visibility)
     selected_page = option_menu(
         menu_title=None, 
         options=["AI Assistant", "Tax Estimator", "Calendar"], 
@@ -112,32 +87,42 @@ with st.sidebar:
         default_index=0,
         styles={
             "container": {"padding": "0!important", "background-color": "transparent"},
-            "icon": {"color": "#00C853", "font-size": "18px"}, # Neon Green Icons
-            "nav-link": {
-                "font-size": "16px",
-                "text-align": "left",
-                "margin": "5px",
-                "color": "#E0E0E0",
-            },
-            # THE FIX: Dark Grey Background + Green Text + Green Border
-            # This ensures the Green Icon stands out against the Dark Grey background
-            "nav-link-selected": {
-                "background-color": "#1F2937", 
-                "color": "#00C853", 
-                "font-weight": "bold",
-                "border-left": "5px solid #00C853"
-            }, 
+            "icon": {"color": "#00C853", "font-size": "18px"}, 
+            "nav-link": {"font-size": "16px", "text-align": "left", "margin": "5px", "color": "#E0E0E0"},
+            "nav-link-selected": {"background-color": "#1F2937", "color": "#00C853", "font-weight": "bold", "border-left": "5px solid #00C853"}, 
         }
     )
 
     st.markdown("---")
     
-    # Language Selector
-    language = st.selectbox("🗣️ Language / भाषा", ["English", "Hindi (हिंदी)", "Hinglish", "Marathi (मराठी)"])
+    # === DYNAMIC FINANCIAL HEALTH WIDGET ===
+    st.markdown("### 💳 Financial Health")
     
+    current_score = st.session_state["compliance_score"]
+    
+    if current_score < 50:
+        bar_color = "red"
+        msg = "⚠️ Risk: High"
+    elif current_score < 80:
+        bar_color = "yellow"
+        msg = "⚠️ Improve Score"
+    else:
+        bar_color = "green"
+        msg = "✅ Excellent"
+
+    st.write(f"**Score:** {current_score}/100")
+    st.progress(current_score)
+    st.caption(msg)
+    
+    if st.session_state["loan_unlocked"]:
+        st.success("✅ **Eligible: Mudra Loan (₹5L)**")
+    else:
+        st.error("🔒 **Loan Locked** (File Tax to Unlock)")
+        
     st.markdown("---")
+    language = st.selectbox("🗣️ Language", ["English", "Hindi", "Marathi"])
     
-    # Status Indicator
+    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     <div style="background: rgba(0, 200, 83, 0.1); border: 1px solid #00C853; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px;">
         <div style="width: 10px; height: 10px; background: #00C853; border-radius: 50%; box-shadow: 0 0 10px #00C853;"></div>
@@ -145,12 +130,12 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# --- 4. API Key Setup ---
-raw_api_key = "AIzaSyAJLhXLQaY4U-u6ipI_IFROXi_n1m5MAug"
+# --- 5. API Key Setup ---
+raw_api_key = "AIzaSyAJLhXLQaY4U-u6ipI_IFROXi_n1m5MAug" 
 my_key = raw_api_key.strip()
 os.environ["GOOGLE_API_KEY"] = my_key
 
-# --- 5. Main Logic ---
+# --- 6. Main Logic ---
 
 # ==========================
 # 🤖 TAB 1: AI ASSISTANT
@@ -160,66 +145,35 @@ if selected_page == "AI Assistant":
     st.markdown("Your **Real-time Compliance Copilot**. Ask about GST, 44ADA, or Penalties.")
     st.markdown("---")
     
-    user_query = st.text_input("Describe your situation (e.g., 'I am a freelance designer earning 15L...'):")
+    col_p1, col_p2, col_p3 = st.columns(3)
+    if col_p1.button("📉 Save Tax on 15L"): st.session_state["prompt_input"] = "I am a freelancer earning 15 Lakhs. How can I save tax?"
+    if col_p2.button("🧾 What is 44ADA?"): st.session_state["prompt_input"] = "Explain Section 44ADA in simple terms."
+    if col_p3.button("⚠️ GST Penalty Limits"): st.session_state["prompt_input"] = "What is the penalty for late GST filing?"
+
+    default_prompt = st.session_state.get("prompt_input", "")
+    user_query = st.text_input("Describe your situation:", value=default_prompt)
     
     if st.button("🚀 Ask Copilot"):
-        if "PASTE" in my_key:
-             st.error("❌ Please paste your API Key in app.py")
-        elif not user_query:
-            st.warning("⚠️ Please enter a question.")
+        if "PASTE" in my_key: st.error("❌ API Key Missing")
+        elif not user_query: st.warning("⚠️ Enter a question.")
         else:
-            with st.spinner(f"Analyzing in {language}..."):
+            with st.spinner(f"Analyzing..."):
                 try:
-                    gemini_llm = ChatGoogleGenerativeAI(
-                        model="gemini-2.5-flash",
-                        verbose=True,
-                        temperature=0.3,
-                        google_api_key=my_key
-                    )
-
-                    tax_expert = Agent(
-                        role='Compliance Expert',
-                        goal='Simplify tax laws for micro-businesses and gig workers.',
-                        backstory="You are an expert CA. You remove fear by explaining rules simply and clearly.", 
-                        verbose=True,
-                        allow_delegation=False,
-                        llm=gemini_llm 
-                    )
-
-                    if language == "English":
-                        lang_instruction = "Answer in professional English. Use bullet points for clarity. Avoid long paragraphs."
-                    elif language == "Hindi (हिंदी)":
-                        lang_instruction = "Answer in Hindi (Devanagari). Use bullet points. Keep financial terms in English brackets e.g. कर (Tax)."
-                    elif language == "Marathi (मराठी)":
-                        lang_instruction = "Answer in Marathi. Use bullet points."
-                    else: 
-                        lang_instruction = "Answer in Hinglish. Use bullet points."
-
-                    answer_task = Task(
-                        description=f"User Query: '{user_query}'. {lang_instruction}. Provide a helpful, structured answer. Prioritize clarity over brevity, but avoid fluff.",
-                        expected_output=f"Structured advice in {language} with bullet points.",
-                        agent=tax_expert
-                    )
-
-                    crew = Crew(agents=[tax_expert], tasks=[answer_task], verbose=True, memory=False)
+                    gemini_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3, google_api_key=my_key)
+                    tax_expert = Agent(role='Expert', goal='Simplify tax.', backstory="Expert CA.", llm=gemini_llm)
+                    task = Task(description=f"Query: {user_query}. Answer in {language} bullet points.", expected_output="Advice.", agent=tax_expert)
+                    crew = Crew(agents=[tax_expert], tasks=[task], verbose=True)
                     result = crew.kickoff()
-                    
                     st.success("✅ Advice Generated")
-                    st.markdown(f"""
-                    <div style="background-color: #111827; padding: 20px; border-radius: 10px; border-left: 5px solid #00C853; color: #E0E0E0; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                        {result}
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                except Exception as e:
-                    st.error(f"Error: {e}")
+                    st.markdown(f'<div style="background-color:#111827;padding:20px;border-radius:10px;border-left:5px solid #00C853;">{result}</div>', unsafe_allow_html=True)
+                except Exception as e: st.error(f"Error: {e}")
 
 # ==========================
-# 🧮 TAB 2: SMART ESTIMATOR
+# 🧮 TAB 2: SMART ESTIMATOR (Updated Logic)
 # ==========================
 elif selected_page == "Tax Estimator":
-    st.title("🧮 Smart Tax Estimator (FY 2025-26)")
-    st.markdown("Calculate tax for **Micro-Businesses** & **Freelancers**.")
+    st.title("🧮 Smart Tax Estimator")
+    st.markdown("Calculate tax based on your preferred regime.")
     st.markdown("---")
 
     col1, col2 = st.columns([1, 1], gap="large")
@@ -227,40 +181,58 @@ elif selected_page == "Tax Estimator":
     with col1:
         st.subheader("1. Business Details")
         
-        user_type = st.selectbox(
-            "I am a...", 
-            ["Freelancer / Professional", "Small Trader / Shopkeeper"]
+        # 1. Basic Inputs
+        user_type = st.selectbox("I am a...", ["Freelancer / Professional", "Small Trader / Shopkeeper"])
+        gross_income = st.number_input("Annual Revenue (₹)", min_value=0.0, step=50000.0, value=2000000.0, format="%.0f")
+
+        # 2. Select Mode (Logic Fix)
+        st.write("")
+        st.markdown("**⚙️ Select Calculation Mode:**")
+        calc_mode = st.radio(
+            "Mode",
+            ["Presumptive (Standard)", "Regular (Actual Expenses)", "Compare Both (Smart)"],
+            horizontal=True,
+            label_visibility="collapsed"
         )
-        st.session_state["user_type"] = user_type
+
+        # 3. Dynamic Expense Input (Only shows if Regular or Compare is selected)
+        total_expenses = 0.0
+        if calc_mode in ["Regular (Actual Expenses)", "Compare Both (Smart)"]:
+            st.markdown("---")
+            st.markdown(f"**📉 Deduction of Expenses:**")
+            total_expenses = st.number_input(
+                "Total Business Expenses (Rent, Salary, Internet, etc.)", 
+                min_value=0.0, 
+                max_value=gross_income, 
+                step=10000.0, 
+                value=800000.0, 
+                format="%.0f",
+                help="Enter actual expenses to calculate Net Profit for Regular Tax."
+            )
+            actual_profit = gross_income - total_expenses
+            st.caption(f"📈 Your Actual Net Profit: ₹{actual_profit:,.0f}")
         
-        gross_income = st.number_input("Annual Revenue (₹)", min_value=0, step=50000, value=2000000)
-        
+        # Determine Presumptive Rates
         if user_type == "Freelancer / Professional":
             profit_rate = 0.50
             section_name = "Section 44ADA"
-            desc = "As a professional, the govt assumes **50%** of your receipts are profit."
         else:
-            profit_rate = 0.06 
+            profit_rate = 0.06
             section_name = "Section 44AD"
-            desc = "As a small trader (digital), the govt assumes only **6%** of your turnover is profit."
-
-        st.markdown(f"""
-        <div style="background-color: #064E3B; padding: 15px; border-radius: 8px; border: 1px solid #059669; color: #D1FAE5; margin-top: 10px;">
-            <strong>💡 {section_name} Logic:</strong><br>{desc}
-        </div>
-        """, unsafe_allow_html=True)
+            
+        calculate_btn = st.button("🚀 Calculate Tax", type="primary")
 
     with col2:
-        st.subheader("2. The Calculation")
+        st.subheader("2. Tax Analysis")
         
-        if user_type == "Small Trader / Shopkeeper":
-            normal_profit = gross_income * 0.15 
-        else:
-            normal_profit = gross_income * 0.80 
-            
-        presumptive_profit = gross_income * profit_rate
-        
-        def calculate_tax(income):
+        # Trigger Score Update on Click
+        if calculate_btn:
+            st.session_state["compliance_score"] = 92
+            st.session_state["loan_unlocked"] = True
+            st.rerun()
+
+        # === CALCULATION LOGIC ===
+        def get_tax(income):
             if income <= 300000: return 0
             tax = 0
             if income > 300000: tax += (min(income, 700000) - 300000) * 0.05
@@ -268,133 +240,82 @@ elif selected_page == "Tax Estimator":
             if income > 1000000: tax += (min(income, 1200000) - 1000000) * 0.15
             if income > 1200000: tax += (min(income, 1500000) - 1200000) * 0.20
             if income > 1500000: tax += (income - 1500000) * 0.30
-            if income <= 700000: return 0
             return tax * 1.04 
 
-        tax_normal = calculate_tax(normal_profit)
-        tax_presumptive = calculate_tax(presumptive_profit)
-        savings = tax_normal - tax_presumptive
+        # 1. Presumptive Math
+        presumptive_profit = gross_income * profit_rate
+        tax_presumptive = get_tax(presumptive_profit)
 
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Regular Tax", f"₹{tax_normal:,.0f}")
-        c2.metric(f"{section_name} Tax", f"₹{tax_presumptive:,.0f}", delta=f"-₹{savings:,.0f}", delta_color="inverse")
-        c3.metric("You Save", f"₹{savings:,.0f}")
+        # 2. Regular Math (Only if expenses provided)
+        tax_regular = 0
+        if calc_mode != "Presumptive (Standard)":
+            tax_regular = get_tax(gross_income - total_expenses)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        # === DISPLAY LOGIC ===
+        
+        # SCENARIO A: PRESUMPTIVE ONLY
+        if calc_mode == "Presumptive (Standard)":
+            st.metric(f"{section_name} Tax", f"₹{tax_presumptive:,.0f}", help=f"Calculated on flat {profit_rate*100}% profit")
+            st.info(f"💡 **Why this?** No need to maintain expense books. Govt assumes flat profit.")
 
-        # --- PLOTLY CHART ---
-        fig = go.Figure()
+        # SCENARIO B: REGULAR ONLY
+        elif calc_mode == "Regular (Actual Expenses)":
+            st.metric("Regular Tax (Audit)", f"₹{tax_regular:,.0f}", help=f"Calculated on Profit: ₹{(gross_income-total_expenses):,.0f}")
+            st.info(f"💡 **Why this?** Good if your actual profit is VERY low (high expenses). Requires bookkeeping.")
 
-        # Regular Bar
-        fig.add_trace(go.Bar(
-            x=['Regular Audit'],
-            y=[tax_normal],
-            name='Regular Tax',
-            marker=dict(color='#374151', line=dict(color='#6B7280', width=1)),
-            text=[f"₹{tax_normal:,.0f}"],
-            textposition='auto',
-            textfont=dict(color='white', size=16, family="Inter", weight="bold")
-        ))
+        # SCENARIO C: COMPARE BOTH
+        else:
+            savings = tax_regular - tax_presumptive
+            c1, c2, c3 = st.columns(3)
+            
+            c1.metric("Regular", f"₹{tax_regular:,.0f}")
+            c2.metric("Presumptive", f"₹{tax_presumptive:,.0f}")
+            
+            if savings > 0:
+                c3.metric("You Save", f"₹{savings:,.0f}", delta="Best Choice")
+                st.success(f"✅ Recommendation: **{section_name}** is better.")
+            elif savings < 0:
+                diff = abs(savings)
+                c3.metric("You Save", f"₹{diff:,.0f}", delta="Regular is Better")
+                st.warning(f"⚠️ Recommendation: **Regular Tax** is better because your expenses are high.")
+            else:
+                c3.metric("Diff", "₹0")
 
-        # Presumptive Bar
-        fig.add_trace(go.Bar(
-            x=[f'Presumptive ({section_name})'],
-            y=[tax_presumptive],
-            name=f'{section_name} Tax',
-            marker=dict(color='#00C853', line=dict(color='#69F0AE', width=2)),
-            text=[f"₹{tax_presumptive:,.0f}"],
-            textposition='auto',
-            textfont=dict(color='black', size=16, family="Inter", weight="bold")
-        ))
+            # Chart for Comparison
+            fig = go.Figure()
+            fig.add_trace(go.Bar(x=['Regular'], y=[tax_regular], marker=dict(color='#374151')))
+            fig.add_trace(go.Bar(x=['Presumptive'], y=[tax_presumptive], marker=dict(color='#00C853')))
+            fig.update_layout(height=250, margin=dict(t=10, b=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig, use_container_width=True)
 
-        # Savings Arrow
-        if savings > 0:
-            fig.add_annotation(
-                x=f'Presumptive ({section_name})',
-                y=tax_presumptive + (savings / 3),
-                text=f"<b>You Save ₹{savings:,.0f}!</b>",
-                showarrow=True,
-                arrowhead=2,
-                arrowsize=1,
-                arrowwidth=2,
-                arrowcolor="#00E676",
-                ax=0,
-                ay=-40,
-                font=dict(color="#00E676", size=14)
-            )
-
-        fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            showlegend=False,
-            height=350,
-            margin=dict(l=0, r=0, t=30, b=0),
-            xaxis=dict(showgrid=False, tickfont=dict(color='#E0E0E0', size=14, family="Inter")),
-            yaxis=dict(showgrid=True, gridcolor='#333333', tickfont=dict(color='#E0E0E0', size=12), tickformat="₹")
-        )
-
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        # Download Report
+        report_text = f"Tax Analysis\nMode: {calc_mode}\nRegular Tax: {tax_regular}\nPresumptive Tax: {tax_presumptive}"
+        st.download_button("📄 Download Report", report_text, "tax_summary.txt")
 
 # ==========================
-# 📅 TAB 3: PROACTIVE CALENDAR
+# 📅 TAB 3: CALENDAR
 # ==========================
 elif selected_page == "Calendar":
-    st.title("📅 Proactive Compliance Calendar")
+    st.title("📅 Compliance Calendar")
     st.markdown("### 🛡️ Your Shield Against Penalties")
     
-    st.sidebar.markdown("---")
-    st.sidebar.header("⚙️ Hackathon Demo Controls")
-    simulated_date = st.sidebar.date_input("🕒 Simulate Today's Date", date(2026, 3, 1))
-    
-    user_persona = st.session_state.get("user_type", "Freelancer / Professional")
-    st.info(f"Viewing Timeline for: **{user_persona}** (Presumptive Scheme)")
+    # If they visit calendar, bump score slightly if it's not already high
+    if st.session_state["compliance_score"] < 50:
+        st.session_state["compliance_score"] = 60
+        st.rerun()
 
     deadlines = [
-        {"Event": "Advance Tax (100% Payment)", "Date": date(2026, 3, 15), "Type": "Money", "Why": "Avoid 1% interest.", "Penalty": "1% interest"},
-        {"Event": "GST Return (QRMP Scheme)", "Date": date(2026, 3, 31), "Type": "Filing", "Why": "Quarterly return.", "Penalty": "Late fee"},
-        {"Event": "ITR Filing (Form ITR-4)", "Date": date(2026, 7, 31), "Type": "Filing", "Why": "Final deadline.", "Penalty": "₹5,000 penalty"},
+        {"Event": "Advance Tax", "Date": date(2026, 3, 15), "Type": "Payment", "Why": "Avoid Interest"},
+        {"Event": "GST Return", "Date": date(2026, 3, 31), "Type": "Filing", "Why": "QRMP Filing"},
+        {"Event": "ITR Filing", "Date": date(2026, 7, 31), "Type": "Filing", "Why": "Final Date"},
     ]
+    
+    col_d1, col_d2 = st.columns([2, 1])
+    with col_d1:
+        for item in deadlines:
+            with st.expander(f"{item['Date']} — {item['Event']}"):
+                st.write(f"**Why:** {item['Why']}")
+                st.button(f"Action: {item['Event']}", key=item['Event'])
 
-    upcoming_deadlines = [d for d in deadlines if d["Date"] >= simulated_date]
-    upcoming_deadlines.sort(key=lambda x: x["Date"])
-
-    if upcoming_deadlines:
-        next_event = upcoming_deadlines[0]
-        days_left = (next_event["Date"] - simulated_date).days
-        
-        if days_left <= 7:
-            bg, border, txt, icon = "#450a0a", "#ef4444", "#fecaca", "🚨"
-        elif days_left <= 30:
-            bg, border, txt, icon = "#422006", "#eab308", "#fef08a", "⚠️"
-        else:
-            bg, border, txt, icon = "#064e3b", "#10b981", "#a7f3d0", "ℹ️"
-
-        st.markdown(f"""
-        <div style="padding: 20px; border-radius: 8px; background-color: {bg}; border: 1px solid {border}; color: {txt}; margin-bottom: 25px;">
-            <h3 style="margin:0; color: {txt} !important;">{icon} {next_event['Event']}</h3>
-            <p style="margin:5px 0 0 0; color: {txt} !important;">Due in <strong>{days_left} DAYS</strong>. {next_event['Why']}</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        c1, c2, c3 = st.columns([1, 1, 2])
-        with c1: st.button(f"Pay Now ➝", key="pay_btn")
-        with c2: st.button("🔔 Remind Me", key="remind_btn")
-            
-        st.progress(max(0, 100 - (days_left * 3)))
-    else:
-        st.success("🎉 You are completely compliant! No upcoming deadlines.")
-
-    st.markdown("### 🗓️ FY 2025-26 Compliance Roadmap")
-    for item in deadlines:
-        d_date = item["Date"]
-        days_diff = (d_date - simulated_date).days
-        status_text = "✅ Completed" if days_diff < 0 else f"📅 Due in {days_diff} days"
-        
-        with st.expander(f"{d_date.strftime('%d %b')} — {item['Event']}"):
-            st.markdown(f"**Status:** {status_text}")
-            st.markdown(f"**Risk:** {item['Penalty']}")
-            st.button(f"Action: {item['Type']}", key=f"btn_{item['Event']}")
-
-# Footer
 st.markdown("---")
 st.markdown("🏆 **Team Tech Titans** | Built for Hackathon 2026")
