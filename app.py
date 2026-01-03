@@ -60,7 +60,6 @@ st.markdown("""
     }
 
     /* 3. BOLD WHITE INPUT BORDERS */
-    /* Target Input Boxes, Select Boxes, Number Inputs */
     div[data-baseweb="select"] > div, 
     div[data-baseweb="base-input"] > div,
     div[data-baseweb="input"] > div {
@@ -73,10 +72,10 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    /* 4. DROPDOWN MENU (The Popup) */
+    /* 4. DROPDOWN MENU */
     div[data-baseweb="popover"] {
         background-color: #111111 !important;
-        border: 2px solid #FFFFFF !important; /* White Border on Popup too */
+        border: 2px solid #FFFFFF !important;
     }
 
     div[data-baseweb="popover"] ul {
@@ -99,17 +98,27 @@ st.markdown("""
         fill: #FFFFFF !important;
     }
 
-    /* 5. SIDEBAR & HEADER */
+    /* 5. SIDEBAR STYLING (UPDATED) */
     [data-testid="stSidebar"] {
-        background-color: #050505 !important;
-        border-right: 2px solid #333 !important; 
+        background-color: #000000 !important;
+        /* CRISP WHITE BORDER ON THE RIGHT */
+        border-right: 1px solid #FFFFFF !important; 
     }
+    
+    /* Internal Sidebar Section Borders */
+    .sidebar-card {
+        border: 1px solid #333;
+        background-color: #0a0a0a;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+
     header[data-testid="stHeader"] { background-color: transparent !important; }
 
     /* 6. BOLD WHITE CARD STYLES */
     .glass-card {
         background: rgba(255, 255, 255, 0.05);
-        /* 2px Solid White Border for Cards */
         border: 2px solid #FFFFFF !important; 
         border-radius: 16px;
         padding: 24px;
@@ -118,7 +127,7 @@ st.markdown("""
     
     .empty-state {
         background: rgba(255, 255, 255, 0.02);
-        border: 2px dashed #FFFFFF !important; /* Bold Dashed White */
+        border: 2px dashed #FFFFFF !important;
         border-radius: 16px;
         text-align: center;
         padding: 60px 20px;
@@ -150,16 +159,18 @@ st.markdown("""
 
 # --- 4. SIDEBAR ---
 with st.sidebar:
+    # 1. Header with Border
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-            <i class="ph-fill ph-circles-three-plus" style="font-size: 30px; color: #00C853;"></i>
-            <h2 style="margin:0; font-size: 24px; color: white !important;">TaxPilot</h2>
+        <div style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <i class="ph-fill ph-circles-three-plus" style="font-size: 28px; color: #00C853;"></i>
+            <div>
+                <h2 style="margin:0; font-size: 22px; color: white !important;">TaxPilot</h2>
+                <small style="color: #888; font-size: 10px;">AI Tax & Compliance</small>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    st.caption("AI Tax & Compliance for India")
-    st.markdown("---")
-
+    # 2. Menu
     selected_page = option_menu(
         menu_title=None, 
         options=["AI Assistant", "Tax Estimator", "Calendar"], 
@@ -167,16 +178,22 @@ with st.sidebar:
         menu_icon="cast", 
         default_index=1,
         styles={
-            "container": {"padding": "0!important", "background-color": "#050505"},
+            "container": {"padding": "0!important", "background-color": "#000000"},
             "icon": {"color": "#00C853", "font-size": "18px"}, 
-            "nav-link": {"color": "#FFFFFF", "font-size": "16px", "margin": "5px", "background-color": "#050505"},
-            "nav-link-selected": {"background-color": "rgba(0, 200, 83, 0.1)", "color": "#00C853", "border": "1px solid #00C853"}, 
+            "nav-link": {"color": "#FFFFFF", "font-size": "16px", "margin": "8px 0", "background-color": "#000000"},
+            "nav-link-selected": {"background-color": "rgba(0, 200, 83, 0.1)", "color": "#00C853", "border": "2px solid #FFFFFF", "border-radius": "8px"}, 
         }
     )
 
-    st.markdown("---")
-    
+    st.write("") # Spacer
+
+    # 3. Financial Health Widget (Now in a Bordered Card)
     current_score = get_compliance_score()
+    
+    st.markdown("""
+    <div class="sidebar-card" style="border: 1px solid #444;">
+    """, unsafe_allow_html=True)
+    
     st.markdown("### <i class='ph ph-heartbeat'></i> Financial Health", unsafe_allow_html=True)
     st.write(f"**Score:** {current_score}/100")
     st.progress(current_score)
@@ -191,16 +208,25 @@ with st.sidebar:
             loan_name = "Mudra Loan"
             amount = "₹5,00,000"
             icon = "ph-bank"
-        st.success(f"✅ Eligible: {loan_name}")
-        st.markdown(f"<small><i class='ph {icon}'></i> Limit: {amount}</small>", unsafe_allow_html=True)
+        
+        st.markdown(f"""
+        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 200, 83, 0.1); border-radius: 8px; border: 1px solid #00C853;">
+            <div style="font-weight: bold; color: #00C853; font-size: 14px;">✅ Eligible: {loan_name}</div>
+            <div style="font-size: 12px; color: #ddd; margin-top: 4px;"><i class="ph {icon}"></i> Limit: {amount}</div>
+        </div>
+        """, unsafe_allow_html=True)
     else:
         st.caption("⚠️ Complete actions to unlock credit.")
+
+    st.markdown("</div>", unsafe_allow_html=True) # End Card
         
-    st.markdown("---")
+    st.write("") # Spacer
+
+    # 4. System Status (Bottom Widget)
     st.markdown("""
-    <div style="background: rgba(0, 200, 83, 0.1); border: 1px solid #00C853; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px;">
+    <div style="border: 1px solid #333; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px;">
         <div style="width: 8px; height: 8px; background: #00C853; border-radius: 50%; box-shadow: 0 0 10px #00C853;"></div>
-        <span style="color: #00C853 !important; font-weight: 600; font-size: 12px;">SYSTEM OPERATIONAL</span>
+        <span style="color: #888 !important; font-weight: 500; font-size: 11px;">SYSTEM OPERATIONAL</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -284,7 +310,7 @@ elif selected_page == "Tax Estimator":
                 total_expenses = st.number_input("Total Annual Expenses (₹)", value=800000.0, step=10000.0, format="%.0f")
             
             st.write("")
-            calculate_btn = st.button("🚀 Calculate Tax & Check Loan", type="primary", use_container_width=True)
+            calculate_btn = st.button("🚀 Calculate Tax", type="primary", use_container_width=True)
 
     with col_result:
         profit_rate = 0.50 if "Freelancer" in user_type else 0.06
@@ -292,10 +318,7 @@ elif selected_page == "Tax Estimator":
         
         # --- FY 2025-26 Logic (Updated Slabs & Rebate) ---
         def get_tax(inc):
-            # 1. Section 87A Rebate: NIL tax if income <= 12 Lakhs
             if inc <= 1200000: return 0
-            
-            # 2. Slab Calculation
             tax = 0
             if inc > 400000: tax += (min(inc, 800000) - 400000) * 0.05
             if inc > 800000: tax += (min(inc, 1200000) - 800000) * 0.10
@@ -303,12 +326,8 @@ elif selected_page == "Tax Estimator":
             if inc > 1600000: tax += (min(inc, 2000000) - 1600000) * 0.20
             if inc > 2000000: tax += (min(inc, 2400000) - 2000000) * 0.25
             if inc > 2400000: tax += (inc - 2400000) * 0.30
-
-            # 3. Marginal Relief
             excess_income = inc - 1200000
             if tax > excess_income: tax = excess_income
-
-            # 4. Cess (4%)
             return tax * 1.04
 
         presumptive_profit = gross_income * profit_rate
@@ -324,12 +343,22 @@ elif selected_page == "Tax Estimator":
             if calc_mode == "Compare Both (Smart)":
                 if savings > 0:
                     st.markdown(f"""
-                    <div class="glass-card" style="background: rgba(0, 200, 83, 0.1); border-color: #00C853; text-align: center;">
+                    <div class="glass-card" style="background: rgba(0, 200, 83, 0.1); border-color: #00C853 !important; text-align: center;">
                         <h3 style="margin:0; color: #E0E0E0 !important; font-size: 1rem;">🎉 YOU SAVE</h3>
                         <h1 style="margin:0; font-size: 3rem; color: #00C853 !important;">₹{savings:,.0f}</h1>
-                        <p style="margin:0; opacity: 0.8; color: white !important;">by choosing Presumptive Scheme</p>
+                        <p style="margin:0; opacity: 0.8; color: white !important;">by choosing {section_name} (Presumptive)</p>
                     </div>
                     """, unsafe_allow_html=True)
+                elif savings < 0:
+                     st.markdown(f"""
+                    <div class="glass-card" style="background: rgba(255, 82, 82, 0.1); border-color: #FF5252 !important; text-align: center;">
+                        <h3 style="margin:0; color: #E0E0E0 !important; font-size: 1rem;">⚠️ BETTER OPTION</h3>
+                        <h1 style="margin:0; font-size: 2rem; color: #FF5252 !important;">Regular Tax Regime</h1>
+                        <p style="margin:0; opacity: 0.8; color: white !important;">Presumptive is expensive by ₹{abs(savings):,.0f}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.info("Both regimes result in the same tax liability.")
                 
                 c1, c2 = st.columns(2)
                 with c1:
@@ -339,7 +368,7 @@ elif selected_page == "Tax Estimator":
 
                 st.markdown("#### Visual Comparison")
                 fig = go.Figure(data=[
-                    go.Bar(name='Regular', x=['Tax'], y=[tax_regular], marker_color='#2c3e50'),
+                    go.Bar(name='Regular', x=['Tax'], y=[tax_regular], marker_color='#FF5252'),
                     go.Bar(name='Presumptive', x=['Tax'], y=[tax_presumptive], marker_color='#00C853')
                 ])
                 fig.update_layout(height=200, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#FFFFFF'), showlegend=False, margin=dict(l=0,r=0,t=0,b=0))
