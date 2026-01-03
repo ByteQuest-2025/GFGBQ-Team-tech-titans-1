@@ -9,8 +9,5 @@ python-dotenv
 streamlit-option-menu
 plotly
 altair
-
-# --- CRITICAL VERSION FIXES ---
-# Pinned to prevent the CrewAI/Transformers conflict
 transformers==4.46.0
 tokenizers==0.20.3
