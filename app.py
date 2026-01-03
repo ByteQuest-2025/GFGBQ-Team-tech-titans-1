@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import pandas as pd
+import plotly.graph_objects as go 
 from datetime import datetime, date
 from crewai import Agent, Task, Crew
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -34,14 +35,22 @@ st.markdown("""
         border-right: 1px solid #1F2937;
     }
 
-    /* 3. Headers (Neon Glow) */
+    /* 3. HEADER FIX */
+    header[data-testid="stHeader"] {
+        background-color: #050505 !important;
+    }
+    header[data-testid="stHeader"] * {
+        color: #E0E0E0 !important;
+    }
+
+    /* 4. Headers (Neon Glow) */
     h1, h2, h3 {
         color: #FFFFFF !important;
         text-shadow: 0 0 10px rgba(0, 200, 83, 0.4);
         font-weight: 800 !important;
     }
 
-    /* 4. Metric Cards */
+    /* 5. Metric Cards */
     .stMetric {
         background-color: #111111 !important;
         border: 1px solid #333333 !important;
@@ -56,14 +65,14 @@ st.markdown("""
         color: #9CA3AF !important;
     }
 
-    /* 5. Input Fields */
+    /* 6. Input Fields */
     .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div>div {
         background-color: #161B22 !important; 
         color: #E0E0E0 !important;
         border: 1px solid #30363D;
     }
     
-    /* 6. Buttons */
+    /* 7. Buttons */
     .stButton > button {
         background: linear-gradient(90deg, #00C853, #009688) !important;
         color: white !important;
@@ -85,9 +94,7 @@ st.sidebar.markdown("---")
 st.sidebar.success("✅ System Online")
 
 # --- 4. API Key Setup ---
-# PASTE YOUR KEY HERE
 raw_api_key = "AIzaSyAJLhXLQaY4U-u6ipI_IFROXi_n1m5MAug"
-
 my_key = raw_api_key.strip()
 os.environ["GOOGLE_API_KEY"] = my_key
 
@@ -217,15 +224,71 @@ elif page == "🧮 Smart Tax Estimator":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # --- NATIVE STREAMLIT CHART (Reliable) ---
-        # This works perfectly in all themes
-        chart_data = pd.DataFrame({
-            "Regime": ["Regular Audit", f"Presumptive ({section_name})"],
-            "Tax Payable": [tax_normal, tax_presumptive]
-        })
-        
-        # We specify Neon Green color to match the theme
-        st.bar_chart(chart_data, x="Regime", y="Tax Payable", color="#00C853")
+        # --- DETAILED PLOTLY CHART (Upgraded) ---
+        fig = go.Figure()
+
+        # 1. Regular Audit Bar (Dark Grey)
+        fig.add_trace(go.Bar(
+            x=['Regular Audit'],
+            y=[tax_normal],
+            name='Regular Tax',
+            marker=dict(color='#374151', line=dict(color='#6B7280', width=1)),
+            text=[f"₹{tax_normal:,.0f}"],
+            textposition='auto',
+            textfont=dict(color='white', size=16, family="Inter", weight="bold"),
+            hoverinfo='y+name'
+        ))
+
+        # 2. Presumptive Tax Bar (Neon Green)
+        fig.add_trace(go.Bar(
+            x=[f'Presumptive ({section_name})'],
+            y=[tax_presumptive],
+            name=f'{section_name} Tax',
+            marker=dict(color='#00C853', line=dict(color='#69F0AE', width=2)),
+            text=[f"₹{tax_presumptive:,.0f}"],
+            textposition='auto',
+            textfont=dict(color='black', size=16, family="Inter", weight="bold"),
+            hoverinfo='y+name'
+        ))
+
+        # 3. Add Annotation (Arrow showing Savings)
+        if savings > 0:
+            fig.add_annotation(
+                x=f'Presumptive ({section_name})',
+                y=tax_presumptive + (savings / 2),
+                text=f"<b>You Save ₹{savings:,.0f}!</b>",
+                showarrow=True,
+                arrowhead=2,
+                arrowsize=1,
+                arrowwidth=2,
+                arrowcolor="#00E676",
+                ax=0,
+                ay=-40,
+                font=dict(color="#00E676", size=14)
+            )
+
+        # 4. Final Layout
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            showlegend=False,
+            height=400,
+            margin=dict(l=0, r=0, t=40, b=0),
+            xaxis=dict(
+                showgrid=False,
+                tickfont=dict(color='#E0E0E0', size=14, family="Inter")
+            ),
+            yaxis=dict(
+                showgrid=True,
+                gridcolor='#333333',
+                gridwidth=1,
+                tickfont=dict(color='#E0E0E0', size=12, family="Inter"),
+                tickformat="₹",
+                zeroline=False
+            )
+        )
+
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
 # ==========================
 # 📅 TAB 3: PROACTIVE CALENDAR
