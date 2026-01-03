@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 import pandas as pd
-import altair as alt  # Visualization Library
 from datetime import datetime, date
 from crewai import Agent, Task, Crew
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -11,7 +10,7 @@ st.set_page_config(
     page_title="TaxPilot", 
     page_icon="💰", 
     layout="wide",
-    initial_sidebar_state="expanded" # Forces Sidebar to stay open
+    initial_sidebar_state="expanded"
 )
 
 # --- 2. PREMIUM DARK MODE CSS ---
@@ -28,7 +27,7 @@ st.markdown("""
 
     /* 2. Backgrounds */
     .stApp {
-        background-color: #050505; /* Deep Black */
+        background-color: #050505; 
     }
     [data-testid="stSidebar"] {
         background-color: #0A0A0A;
@@ -218,39 +217,15 @@ elif page == "🧮 Smart Tax Estimator":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # --- CHART FIX: Solid Colors & Explicit White Text ---
+        # --- NATIVE STREAMLIT CHART (Reliable) ---
+        # This works perfectly in all themes
         chart_data = pd.DataFrame({
             "Regime": ["Regular Audit", f"Presumptive ({section_name})"],
             "Tax Payable": [tax_normal, tax_presumptive]
         })
-
-        # We remove the Gradient object because it often fails in Dark Mode
-        # We use simple HEX colors instead
         
-        chart = alt.Chart(chart_data).mark_bar(
-            cornerRadiusTopLeft=10,
-            cornerRadiusTopRight=10
-        ).encode(
-            x=alt.X('Regime', axis=alt.Axis(labelColor='white', title=None, labelAngle=0)),
-            y=alt.Y('Tax Payable', axis=alt.Axis(labelColor='white', title=None, grid=False, format='₹,.0f')),
-            color=alt.condition(
-                alt.datum.Regime == f'Presumptive ({section_name})',
-                alt.value('#00C853'),  # Solid Neon Green (Good)
-                alt.value('#374151')   # Dark Grey (Bad)
-            ),
-            tooltip=['Regime', 'Tax Payable']
-        ).properties(
-            height=300,
-            background='transparent'
-        ).configure_view(
-            stroke=None
-        ).configure_axis(
-            domainColor='#374151',
-            tickColor='#374151'
-        )
-
-        # Theme=None ensures Streamlit doesn't overwrite our White text
-        st.altair_chart(chart, use_container_width=True, theme=None)
+        # We specify Neon Green color to match the theme
+        st.bar_chart(chart_data, x="Regime", y="Tax Payable", color="#00C853")
 
 # ==========================
 # 📅 TAB 3: PROACTIVE CALENDAR
@@ -279,7 +254,6 @@ elif page == "📅 Compliance Calendar":
         next_event = upcoming_deadlines[0]
         days_left = (next_event["Date"] - simulated_date).days
         
-        # Dark Mode Alerts
         if days_left <= 7:
             bg, border, txt, icon = "#450a0a", "#ef4444", "#fecaca", "🚨"
         elif days_left <= 30:
