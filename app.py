@@ -1,5 +1,7 @@
 import streamlit as st
 import os
+import datetime
+from datetime import date
 import plotly.graph_objects as go
 from crewai import Agent, Task, Crew
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -62,14 +64,21 @@ st.markdown("""
     /* 3. BOLD WHITE INPUT BORDERS */
     div[data-baseweb="select"] > div, 
     div[data-baseweb="base-input"] > div,
-    div[data-baseweb="input"] > div {
+    input.st-bd {
         background-color: #111111 !important;
-        border: 2px solid #FFFFFF !important; /* BOLD WHITE BORDER */
+        border: 2px solid #FFFFFF !important;
         color: #FFFFFF !important;
         border-radius: 8px !important;
     }
     input {
         color: #FFFFFF !important;
+    }
+
+    /* Fix for Date Input in Sidebar */
+    div[data-baseweb="input"] > div {
+        background-color: #111111 !important;
+        border: 2px solid #FFFFFF !important;
+        border-radius: 8px !important;
     }
 
     /* 4. DROPDOWN MENU */
@@ -98,20 +107,18 @@ st.markdown("""
         fill: #FFFFFF !important;
     }
 
-    /* 5. SIDEBAR STYLING (UPDATED) */
+    /* 5. SIDEBAR STYLING */
     [data-testid="stSidebar"] {
         background-color: #000000 !important;
-        /* CRISP WHITE BORDER ON THE RIGHT */
         border-right: 1px solid #FFFFFF !important; 
     }
     
-    /* Internal Sidebar Section Borders */
-    .sidebar-card {
-        border: 1px solid #333;
-        background-color: #0a0a0a;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 15px;
+    /* Target the native Streamlit container in sidebar to look like our card */
+    [data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #0a0a0a !important;
+        border: 1px solid #444 !important;
+        border-radius: 12px !important;
+        padding: 15px !important;
     }
 
     header[data-testid="stHeader"] { background-color: transparent !important; }
@@ -159,7 +166,7 @@ st.markdown("""
 
 # --- 4. SIDEBAR ---
 with st.sidebar:
-    # 1. Header with Border
+    # 1. Header
     st.markdown("""
         <div style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
             <i class="ph-fill ph-circles-three-plus" style="font-size: 28px; color: #00C853;"></i>
@@ -177,52 +184,63 @@ with st.sidebar:
         icons=["robot", "calculator", "calendar-check"], 
         menu_icon="cast", 
         default_index=1,
+        key="nav_menu", 
         styles={
             "container": {"padding": "0!important", "background-color": "#000000"},
             "icon": {"color": "#00C853", "font-size": "18px"}, 
             "nav-link": {"color": "#FFFFFF", "font-size": "16px", "margin": "8px 0", "background-color": "#000000"},
-            "nav-link-selected": {"background-color": "rgba(0, 200, 83, 0.1)", "color": "#00C853", "border": "2px solid #FFFFFF", "border-radius": "8px"}, 
+            "nav-link-selected": {"background-color": "rgba(0, 200, 83, 0.1)", "color": "#00C853", "border": "3px solid #FFFFFF", "border-radius": "8px"}, 
         }
     )
 
-    st.write("") # Spacer
+    # 3. CONDITIONAL DATE PICKER (Only shows if Calendar is selected)
+    simulated_today = date(2026, 3, 1) # Default
+    
+    if selected_page == "Calendar":
+        st.markdown("---") # Simple separator
+        st.caption("📅 Simulation Date")
+        # Ensure we use date(2026, 3, 1) as a default anchor
+        simulated_today = st.date_input(
+            "Current Date", 
+            date(2026, 3, 1), 
+            key="calendar_date_picker",
+            label_visibility="collapsed"
+        )
+    
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # 3. Financial Health Widget (Now in a Bordered Card)
+    # 4. Financial Health Widget (Fixed: No ghost box!)
     current_score = get_compliance_score()
     
-    st.markdown("""
-    <div class="sidebar-card" style="border: 1px solid #444;">
-    """, unsafe_allow_html=True)
-    
-    st.markdown("### <i class='ph ph-heartbeat'></i> Financial Health", unsafe_allow_html=True)
-    st.write(f"**Score:** {current_score}/100")
-    st.progress(current_score)
-    
-    if current_score > 80:
-        role = st.session_state.get("user_role", "Small Trader / Shopkeeper")
-        if "Freelancer" in role:
-            loan_name = "Business Credit"
-            amount = "₹2,00,000"
-            icon = "ph-credit-card"
+    # We use st.container(border=True) which we styled with CSS above
+    with st.container(border=True):
+        st.markdown("### <i class='ph ph-heartbeat'></i> Financial Health", unsafe_allow_html=True)
+        st.write(f"**Score:** {current_score}/100")
+        st.progress(current_score)
+        
+        if current_score > 80:
+            role = st.session_state.get("user_role", "Small Trader / Shopkeeper")
+            if "Freelancer" in role:
+                loan_name = "Business Credit"
+                amount = "₹2,00,000"
+                icon = "ph-credit-card"
+            else:
+                loan_name = "Mudra Loan"
+                amount = "₹5,00,000"
+                icon = "ph-bank"
+            
+            st.markdown(f"""
+            <div style="margin-top: 10px; padding: 10px; background: rgba(0, 200, 83, 0.1); border-radius: 8px; border: 1px solid #00C853;">
+                <div style="font-weight: bold; color: #00C853; font-size: 14px;">✅ Eligible: {loan_name}</div>
+                <div style="font-size: 12px; color: #ddd; margin-top: 4px;"><i class="ph {icon}"></i> Limit: {amount}</div>
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            loan_name = "Mudra Loan"
-            amount = "₹5,00,000"
-            icon = "ph-bank"
-        
-        st.markdown(f"""
-        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 200, 83, 0.1); border-radius: 8px; border: 1px solid #00C853;">
-            <div style="font-weight: bold; color: #00C853; font-size: 14px;">✅ Eligible: {loan_name}</div>
-            <div style="font-size: 12px; color: #ddd; margin-top: 4px;"><i class="ph {icon}"></i> Limit: {amount}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.caption("⚠️ Complete actions to unlock credit.")
+            st.caption("⚠️ Complete actions to unlock credit.")
+    
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True) # End Card
-        
-    st.write("") # Spacer
-
-    # 4. System Status (Bottom Widget)
+    # 5. System Status
     st.markdown("""
     <div style="border: 1px solid #333; border-radius: 6px; padding: 10px; display: flex; align-items: center; gap: 10px;">
         <div style="width: 8px; height: 8px; background: #00C853; border-radius: 50%; box-shadow: 0 0 10px #00C853;"></div>
@@ -316,7 +334,7 @@ elif selected_page == "Tax Estimator":
         profit_rate = 0.50 if "Freelancer" in user_type else 0.06
         section_name = "Section 44ADA" if "Freelancer" in user_type else "Section 44AD"
         
-        # --- FY 2025-26 Logic (Updated Slabs & Rebate) ---
+        # --- Tax Logic ---
         def get_tax(inc):
             if inc <= 1200000: return 0
             tax = 0
@@ -337,7 +355,6 @@ elif selected_page == "Tax Estimator":
 
         if calculate_btn:
             st.session_state["user_actions"]["calculated_tax"] = True
-            
             st.markdown("### <i class='ph ph-chart-pie-slice'></i> Tax Analysis", unsafe_allow_html=True)
             
             if calc_mode == "Compare Both (Smart)":
@@ -402,19 +419,50 @@ elif selected_page == "Calendar":
         st.toast("Score Updated: Awareness (+10)", icon="📅")
     
     st.markdown('<h1 style="font-size: 3rem;"><i class="ph ph-calendar-check icon-xl"></i> Proactive <span class="gradient-text" style="color:transparent !important;">Compliance</span></h1>', unsafe_allow_html=True)
-    st.markdown("### 🛡️ Your Shield Against Penalties")
-    st.write("")
+    
+    # --- DYNAMIC DATE LOGIC ---
+    deadline_date = date(2026, 3, 15)
+    days_left = (deadline_date - simulated_today).days
+    
+    # Progress Logic (FY 2025-26: Apr 1 2025 to Mar 31 2026)
+    fy_start = date(2025, 4, 1)
+    fy_end = date(2026, 3, 31)
+    total_fy_days = (fy_end - fy_start).days
+    days_passed = (simulated_today - fy_start).days
+    progress_ratio = max(0.0, min(1.0, days_passed / total_fy_days))
+
+    # Alert Styling based on urgency
+    if days_left < 0:
+        alert_color = "#FF5252" # Red
+        alert_title = "OVERDUE"
+        alert_desc = f"You are late by {abs(days_left)} days. Interest applies."
+        bg_color = "rgba(255, 82, 82, 0.1)"
+    elif days_left < 7:
+        alert_color = "#FF5252" # Red (Urgent)
+        alert_title = "URGENT ATTENTION"
+        alert_desc = f"Due in <b>{days_left} DAYS</b> (15th March). Act fast."
+        bg_color = "rgba(255, 82, 82, 0.1)"
+    elif days_left < 30:
+        alert_color = "#FF9800" # Orange
+        alert_title = "Advance Tax (100% Payment)"
+        alert_desc = f"Due in <b>{days_left} DAYS</b> (15th March). Avoid 1% monthly interest."
+        bg_color = "rgba(255, 152, 0, 0.1)"
+    else:
+        alert_color = "#00C853" # Green
+        alert_title = "Compliance on Track"
+        alert_desc = f"Next deadline is in <b>{days_left} days</b>."
+        bg_color = "rgba(0, 200, 83, 0.1)"
 
     role = st.session_state.get("user_role", "Freelancer / Professional")
     st.info(f"Viewing Timeline for: **{role}** (Presumptive Scheme)")
 
-    # THE HERO ALERT
-    st.markdown("""
-    <div style="background: rgba(255, 152, 0, 0.1); border: 1px solid #FF9800; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-        <h3 style="color: #FF9800 !important; margin:0; display:flex; align-items:center; gap:8px;">
-            <i class="ph-fill ph-warning-circle"></i> Advance Tax (100% Payment)
+    # DYNAMIC ALERT BOX
+    st.markdown(f"""
+    <div style="background: {bg_color}; border: 1px solid {alert_color}; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="color: {alert_color} !important; margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="ph-fill ph-warning-circle"></i> {alert_title}
         </h3>
-        <p style="color: #FFFFFF !important; margin: 5px 0;">Due in <b>14 DAYS</b> (15th March). Avoid 1% monthly interest.</p>
+        <p style="color: #FFFFFF !important; margin: 5px 0;">{alert_desc}</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -425,7 +473,10 @@ elif selected_page == "Calendar":
         st.button("🔔 Remind Me", use_container_width=True)
 
     st.write("")
-    st.progress(0.75, text="FY 2025-26 Compliance Roadmap")
+    
+    # DYNAMIC PROGRESS BAR
+    st.progress(progress_ratio, text=f"FY 2025-26 Progress: {int(progress_ratio*100)}%")
+    st.caption(f"Current Date Simulation: {simulated_today.strftime('%d %b %Y')}")
     st.write("")
 
     st.markdown("#### <i class='ph ph-list-checks'></i> Upcoming Events", unsafe_allow_html=True)
