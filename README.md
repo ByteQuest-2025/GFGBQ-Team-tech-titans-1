@@ -15,8 +15,7 @@ https://taxpilot.streamlit.app
 YOUR_YOUTUBE_OR_DRIVE_LINK_HERE
 
 # 6️⃣ PPT Link
-YOUR_PPT_DRIVE_LINK_HERE
-
+https://docs.google.com/presentation/d/1u7uNewfald6TmKmQF14sj7xl9Ic2Jiuy/edit?usp=sharing&ouid=111790594144227329145&rtpof=true&sd=true
 ---
 
 ## ✅ Project Overview
