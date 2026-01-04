@@ -309,9 +309,13 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # --- 5. API KEY ---
-raw_api_key = "AIzaSyD6kXa5ZnAkHdjijRk1F7zIuR2H1tRmmuY" 
-my_key = raw_api_key.strip()
-os.environ["GOOGLE_API_KEY"] = my_key
+try:
+    # This grabs the key from Streamlit's secure storage
+    my_key = st.secrets["GOOGLE_API_KEY"]
+    os.environ["GOOGLE_API_KEY"] = my_key
+except Exception:
+    st.error("⚠️ API Key missing! Please add GOOGLE_API_KEY to Streamlit Secrets.")
+    st.stop()
 
 # --- 6. PAGE LOGIC ---
 
