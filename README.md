@@ -8,14 +8,14 @@
 **Tech Titans**
 
 # 4️⃣ Deployed Link
-[Click Here to Open App](https://taxpilot.streamlit.app)
-*(If you haven't deployed successfully yet, leave this as N/A or put your ngrok link)*
+https://taxpilot.streamlit.app
+
 
 # 5️⃣ 2-Minute Demonstration Video Link
-[Watch Demo Video Here](YOUR_YOUTUBE_OR_DRIVE_LINK_HERE)
+YOUR_YOUTUBE_OR_DRIVE_LINK_HERE
 
 # 6️⃣ PPT Link
-[View Presentation Here](YOUR_PPT_DRIVE_LINK_HERE)
+YOUR_PPT_DRIVE_LINK_HERE
 
 ---
 
