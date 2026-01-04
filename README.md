@@ -1,30 +1,37 @@
-1. Problem Statement: PS 15: Real-Time Tax & Compliance Copilot for Micro-Businesses
-2. Project Name: TaxPilot
-3. Team Name: Tech Titans
-4. Deployed Link: N/A
-5. 2-minute Demonstration Video link: N/A
-6. PPT Link: N/A
+# 1️⃣ Problem Statement
+**PS 15: Real-Time Tax & Compliance Copilot for Micro-Businesses**
+
+# 2️⃣ Project Name
+**TaxPilot**
+
+# 3️⃣ Team Name
+**Tech Titans**
+
+# 4️⃣ Deployed Link
+[Click Here to Open App](https://taxpilot.streamlit.app)
+*(If you haven't deployed successfully yet, leave this as N/A or put your ngrok link)*
+
+# 5️⃣ 2-Minute Demonstration Video Link
+[Watch Demo Video Here](YOUR_YOUTUBE_OR_DRIVE_LINK_HERE)
+
+# 6️⃣ PPT Link
+[View Presentation Here](YOUR_PPT_DRIVE_LINK_HERE)
 
 ---
 
-# Project Overview
-**TaxPilot** is an intelligent, AI-driven compliance assistant designed specifically for India's micro-businesses, freelancers, and gig workers. It simplifies tax compliance by providing real-time answers, tax estimation, and deadline tracking.
+## ✅ Project Overview
+**TaxPilot** is an intelligent, AI-driven compliance ecosystem designed to bridge the gap between India's informal micro-economy and formal credit systems.
 
-# Setup and Installation Instructions
-1.  **Clone/Download the Repository**
-2.  **Install Dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
-3.  **Run the Application**
-    ```bash
-    streamlit run app.py
-    ```
+For millions of freelancers, gig workers, and small shopkeepers, tax compliance is complex, expensive, and fear-inducing. TaxPilot solves this by providing:
+* **Fearless Compliance:** An AI Copilot that answers queries in Hinglish, Hindi, and Marathi.
+* **Smart Estimation:** Instantly compares the Regular Tax Regime vs. Presumptive Taxation (Section 44AD/ADA) to show potential savings.
+* **Formal Proof:** Generates instant PDF Estimate Reports that can be used as income proof for bank loans.
 
-# Usage Instructions
-* **AI Tax Assistant:** Ask questions like "Do I need GST for 10 Lakh income?"
-* **Tax Estimator:** Enter your income to see estimated tax liability.
-* **Compliance Calendar:** Check upcoming tax deadlines.
+## ✅ Setup & Installation Instructions
 
-# Relevant Screenshots
-*(Add screenshots here later)*
+Follow these steps to run the project locally:
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/ByteQuest-2025/GFGBQ-Team-tech-titans-1.git](https://github.com/ByteQuest-2025/GFGBQ-Team-tech-titans-1.git)
+cd GFGBQ-Team-tech-titans-1
