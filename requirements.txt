@@ -9,5 +9,6 @@ python-dotenv
 streamlit-option-menu
 plotly
 altair
+#updated file
 transformers==4.46.0
 tokenizers==0.20.3
